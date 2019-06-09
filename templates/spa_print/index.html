@@ -1,0 +1,37 @@
+<html>
+	<head>
+		<title>Generic</title>
+		<link rel="stylesheet" href="{{url_for('static',filename='libraries/css/vuetify.min.css')}}" >
+		<!--css custom here-->
+		<link rel="stylesheet" href="{{url_for('static',filename='custom/css/index.css')}}" >
+		<script src="{{url_for('static',filename='libraries/js/axios.min.js')}}"></script>
+		<script src="{{url_for('static',filename='libraries/js/vue.js')}}"></script>
+		<script src="{{url_for('static',filename='libraries/js/vuex.js')}}"></script>
+		<script src="{{url_for('static',filename='libraries/js/vue-router.js')}}"></script>
+		<script src="{{url_for('static',filename='libraries/js/jquery.js')}}"></script>
+		<script src="{{url_for('static',filename='libraries/js/vuetify.js')}}"></script>
+	</head>
+	<body>
+		<div id="app">
+			<layout-page/>
+		</div>
+	</body>
+	<script src="{{url_for('static',filename='custom/js/partials.js')}}"></script>
+	<script src="{{url_for('static',filename='custom/js/pages.js')}}"></script>
+	<script src="{{url_for('static',filename='custom/js/components.js')}}"></script>
+	<script src="{{url_for('static',filename='custom/js/store.js')}}"></script>
+	<script src="{{url_for('static',filename='custom/js/routes.js')}}"></script>
+	<script>
+		
+		var vm = new Vue({
+			el:"#app",
+			router:router,
+			store:store,
+			beforeCreate(){
+				store.dispatch('GET_LOGGED_IN_USER_ACTION');
+				store.dispatch('GET_ALL_ANNOUNCEMENTS_ACTION');
+			}
+			//delimiters: ["${", "}"]
+		});
+	</script>
+</html>

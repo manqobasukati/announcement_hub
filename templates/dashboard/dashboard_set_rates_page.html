@@ -1,0 +1,48 @@
+{% extends "dashboard/dashboard_base.html" %}
+{% block title %} {{title}}{% endblock %}
+{% block css %}
+	<link href="{{url_for('static',filename='css/dashboard_announcements_page.css')}}" rel="stylesheet">
+{% endblock %}
+{% block dashboard_content %}
+	<h2>Set Rates</h2>
+		<div class="announcements">
+		<div class="message">
+			{% if message != '' %}
+				{{message}}
+			{% endif %}
+		</div>
+		{% if current_user.media_type == 'radio_media' %}
+		
+			<div class="set-rates-form">
+			
+				<form action="/dashboard/set-rates" method="post">
+					{{form.charge_per_slot.label}}
+					<br />
+					{{form.charge_per_slot}}
+					<br />
+					{{form.submit}}
+				</form>
+			</div>
+		{% elif current_user.media_type == 'print_media' %}
+			<div class="set-rates-form">
+				<form action="/dashboard/set-rates" method="post">
+					{{form.charge_per_word.label}}
+					<br />
+					{{form.charge_per_word}}
+					<br />
+					{{form.charge_per_day.label}}
+					<br />
+					{{form.charge_per_day}}
+					<br />
+					{{form.charge_per_pic.label}}
+					<br />
+					{{form.charge_per_pic}}
+					<br />
+					{{form.submit}}
+				</form>
+			</div>
+		{% endif %}
+		</div>
+						
+		
+{% endblock %}

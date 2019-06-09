@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %} {{title}}{% endblock %}
+{% block css %}
+	<link rel="stylesheet" href="{{url_for('static',filename='css/sign_up_page.css')}}" />
+{% endblock %}
+{% block content %}
+	<div class="row">
+		<div class="col-md-4">
+		</div>
+		<div class="col-md-4 form-section">
+		<h1>{{title}}</h1>
+		<div class="form">
+			<div class="errors">
+				{% if form.errors %}
+					<div class="alert alert-warning">
+					<p>{{form.errors}}</p>
+					</div>
+				{% endif %}
+			</div>
+			<div>
+				<h3><a href="/accounts/email-confirmation/{{media_id}}">{{message}}</a></h3>
+			</div>
+			<form action="/accounts/sign-up" method="POST">
+				{{form.csrf_token}}
+				<div class="form-group">
+					<label for="formlabel">{{form.media_name.label}}</label>
+					{{form.media_name(class_='form-control')}}
+				</div>
+				
+				<div class="form-group">
+					<label for="email">{{form.media_email.label}}</label>
+					{{form.media_email(class_='form-control')}}
+				</div>
+				<div class="form-group">
+					<label for="type">{{form.media_type.label}}</label>
+					{{form.media_type(class_='form-control')}}
+				</div>
+				<div class="form-group">
+					<label for="password">{{form.media_password.label}}</label>
+					{{form.media_password(class_="form-control")}}
+				</div>
+				<div class="form-group">
+					<label for="confirmpassword">{{form.confirm.label}}</label>
+					{{form.confirm(class_="form-control")}}
+				</div>
+				
+				{{form.submit(class_="btn btn-primary")}}
+			</form>
+		</div>
+		</div>
+		<div class="col-md-4">
+		</div>
+	</div>
+{% endblock %}

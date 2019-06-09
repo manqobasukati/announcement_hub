@@ -1,0 +1,74 @@
+{% extends "dashboard/dashboard_base.html" %}
+{% block title %} {{title}}{% endblock %}
+{% block css %}
+	<link href="{{url_for('static',filename='css/dashboard_announcements_page.css')}}" rel="stylesheet">
+{% endblock %}
+{% block dashboard_content %}
+	<h2>Pending Announcements</h2>
+	<hr />
+		<div class="announcements">
+		{% if media.media_type == 'radio_media' %}
+			<div class="radio_media">
+				<h3>{{today}}</h3>
+				<h4 style="margin-left:15px;">Time slot 1</h4>
+					{% for a in first_time_slot %}
+						<div class="col-md-4" style=" margin-right:30;">
+								<div class="announcement" style="padding:5 10 10 10;">
+									<h4>Announcement - {{a.id}}</h4>
+									{% if a.announced == False %}
+										{% for b in a.radio_media_announcement %}
+											{% for c in b.radio_media_announcement_time_slot %}
+												{% if c.time_slot == '10:30' %}
+													<span style=""><a href="/dashboard/announcements/{{a.id}}/{{c.id}}/{{c.time_slot}}">{{c.time_slot}}</a></span>
+												{% endif %}
+											{% endfor %}
+										{% endfor %}
+									{% endif %}
+								</div>
+						</div>
+					{% endfor %}
+					<h4 style="margin-left:15px;">Time slot 2</h4>
+					{% for a in second_time_slot %}
+						<div class="col-md-4" style=" margin-right:30;">
+								<div class="announcement" style="padding:5 10 10 10;">
+									
+									<h4>Announcement - {{a.id}}</h4>
+									{% if a.announced == False %}
+									{% for b in a.radio_media_announcement %}
+										{% for c in b.radio_media_announcement_time_slot %}
+											{% if c.time_slot == '5:30' %}
+												<span style=""><a href="/dashboard/announcements/{{a.id}}/{{c.id}}/{{c.time_slot}}">{{c.time_slot}}</a></span>
+											{% endif %}
+										{% endfor %}
+									{% endfor %}
+									{% endif %}
+								</div>
+						</div>
+					{% endfor %}
+			</div>
+		{% elif media.media_type == 'print_media' %}
+			<div class="print-media">
+			
+				{% for year,announcement in announcements|groupby('start_day.year') %}
+					{% for month, list in announcement|groupby('start_day.month') %}
+					<b>{{month}} {{year}}</b><br />
+					<div class="row">
+						{% for a in announcement %}
+							<div class="col-md-4" style=" margin-right:30;">
+								<div class="announcement" style="padding:5 10 10 10;">
+									<h4>Announcement - {{a.id}}<a href="/dashboard/announcements/{{a.id}}"><i style="margin-left:10px;"class="fa fa-arrow-circle-right fa-sm"></a></i></h4>
+									{% for b in a.print_media_announcement %}
+											<span style="">{{b.section}}</span>		
+									{% endfor %}
+								</div>
+						</div>
+						{% endfor %}
+					</div>
+					{% endfor %}
+				{% endfor %}
+			</div>
+		{% endif %}
+		</div>
+						
+		
+{% endblock %}

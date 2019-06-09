@@ -1,0 +1,70 @@
+{% extends "dashboard/dashboard_base.html" %}
+{% block title %} {{title}}{% endblock %}
+{% block css %}
+	<link href="{{url_for('static',filename='css/dashboard_single_announcement_page.css')}}" rel="stylesheet">
+{% endblock %}
+{% block dashboard_content %}
+	<div class="row">
+	<h2>Announcement - {{a.id}}</h2>
+	<hr />
+	</div>
+		{% if message != '' %}
+			<div div="col-md-3">
+				<div class="content-container" style="padding:5 10 10 10;">
+					<h4>{{message}}</h4>
+				</div>
+			</div>
+		{% endif %}
+		<div class="row">
+			<div div="col-md-3">
+				<div class="content-container" style="padding:5 10 10 10;">
+					<h4>Start day</h4>
+					<h5 style="color:grey">{{a.start_day}}</h5>
+				</div>
+			</div>
+			<div div="col-md-3">
+				<div class="content-container" style="padding:5 10 10 10;">
+					<h4>End day</h4>
+					<h5 style="color:grey">{{a.end_day}}</h5>
+				</div>
+			</div>
+		</div>
+		{% if a.announcement_type == 'radio_media' %}
+			
+			
+				{% for b in a.radio_media_announcement  %}
+					{% if b.type == 'normal' %}
+						<div class="row">
+							<div class="content-container" style="padding:5 10 10 10;">
+								<h4>Contact</h4>
+								<h5 style="color:grey">{{b.contact}}</h5>
+							</div>
+						</div>
+						<div class="row">
+							<div class="content-container" style="padding:5 10 10 10;">
+								<h4>Content</h4>
+								<h5 style="color:grey">{{b.content}}</h5>
+							</div>
+						</div>
+						<div class="row">
+									
+										{% if tm.read == False %}
+											<form action="{{link}}" method="POST">
+												<input name="announce" class="all-buttons"type="submit" value="Announced">
+											</form>
+										{% endif %}
+									
+						</div>
+					{% elif b.type == 'funeral' %}
+						<div class="row">
+						</div>
+					{% endif %}
+				{% endfor %}
+		
+		{% elif a.announcement_type == 'print_media' %}
+			<div class="row">
+				
+			</div>
+		{% endif  %}
+
+{% endblock %}

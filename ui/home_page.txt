@@ -1,0 +1,10 @@
+<html>
+	<head>
+		<title>UI</title>
+		<link href="bootstrap/css/bootstrap.css" rel="stylesheet"/>
+		<link href="font-awesome/css/font-awesome.css" rel="stylesheet">
+		<link href="index.css" rel="stylesheet" >
+	</head>
+	<body>
+	</body>
+</html>

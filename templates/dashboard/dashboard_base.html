@@ -1,0 +1,49 @@
+
+<html>
+	<head>
+		<title>{% block title %} Title here {% endblock %}</title>
+		<link href="{{url_for('static',filename='bootstrap/css/bootstrap.css')}}" rel="stylesheet"/>
+		<link href="{{url_for('static',filename='font-awesome/css/font-awesome.css')}}" rel="stylesheet">
+		<link href="{{url_for('static',filename='css/index.css')}}" rel="stylesheet" >
+		{% block css %} 
+		
+		{% endblock %}
+	</head>
+	<body>	
+		<div class="container-fluid">
+		<header>
+			
+			<div class="row dashboard-navigation">
+				<div class="col-md-1">
+					<img class="logo" src="{{url_for('static',filename='images/ahub_logo/logo_3.png')}}" width="50"/>
+				</div>
+				<div class="col-md-3" >
+					{% block logged_in_media %}
+					<div class="loggind-in-media">
+						<h4>Voice of the church</h4>
+					</div>
+					{% endblock %}
+				</div>
+				<div class="col-md-8" >
+					<nav>
+						<ul class="nav-bar">
+							<li>ANNOUNCEMENTS</li>
+							<li>SET RATES</li>
+							<li>PROFILE</li>
+							<li>LOGOUT</li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</header>
+		<div class="dashboard-content">
+			{% block dashboard_content %}
+			
+			{% endblock %}
+		</div>
+		
+		{% block js %}
+		{% endblock %}
+		</div>
+	</body>
+</html>

@@ -1,0 +1,49 @@
+{% for year,announcement in announcements|groupby('start_day.year') %}
+					{% for month, list in announcement|groupby('start_day.month') %}
+					{% for day, y in announcement|groupby('start_day.day') %}
+					<b>{{day}}/{{month}}/{{year}}</b><br />
+					<div class="row">
+					{% for a in announcement %}
+					   
+						<div class="col-md-4" style=" margin-right:30;">
+								<div class="announcement" style="padding:5 10 10 10;">
+									<h4>Announcement - {{a.id}}</h4>
+									<span style="">Time slots:</span>
+									{% for b in a.radio_media_announcement %}
+										{% for c in b.radio_media_announcement_time_slot %}
+											{% if c.read == False %}
+												<span style=""><a href="/dashboard/announcements/{{a.id}}/{{c.id}}/{{c.time_slot}}">{{c.time_slot}}</a></span>
+											{% endif %}
+										{% endfor %}
+									{% endfor %}
+								</div>
+						</div>
+					{% endfor %}
+					</div>
+					{% endfor %}
+				{% endfor %}
+				{% endfor %}
+				
+				/dashboard/announcements/{{a.id}}/{{c.id}}/{{c.time_slot}}
+				
+				{% for c in b.radio_media_announcement_time_slot %}
+													{% endfor %}
+													
+													
+				<div class="grid-container">
+				<div class="grid-item-1">
+					
+					<h2>Voice of the church asfdgfa wgaeds gfrrfagf </h2>
+
+				</div>
+				<div class="grid-item">
+					<nav>
+						<ul class="nav-bar">
+							<li>ANNOUNCEMENTS</li>
+							<li>SET RATES</li>
+							<li>PROFILE</li>
+							<li>LOGOUT</li>
+						</ul>
+					</nav>
+				</div>
+			</div>

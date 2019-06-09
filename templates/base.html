@@ -1,0 +1,40 @@
+<html>
+	<head>
+		<title>{% block title %} {% endblock %}</title>
+		<link rel="stylesheet" href="{{url_for('static',filename='bootstrap/css/bootstrap.css')}}"/>
+		<link rel="stylesheet" href="{{url_for('static',filename='css/base.css')}}" />
+		{% block css %}
+		{% endblock %}
+	</head>
+	<body>
+	<div class="container-fluid">
+	<div class="navigation">
+		<div class="row navigation">
+			<div class="col-md-4">
+				<img class="logo" src="{{url_for('static',filename='images/ahub_logo/logo_3.png')}}" width="50"/>
+			</div>
+			<div class="col-md-3">
+				
+			</div>
+			<div class="col-md-4">
+				<nav>
+					<ul>
+						<li><a href="/">Home</a></li>
+						<li><a>About</a></li>
+						<li><a href="{{url_for('account_print.sign_up_view')}}">Sign Up</a></li>
+						<li><a href="{{url_for('account_print.sign_in_view')}}">Sign In</a></li>
+						<li>Team</li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+	
+	<div class="content">
+	{% block content %}
+	{% endblock %}
+	</div>
+	</div>
+	<script src="{{url_for('static', filename='js/jquery.js')}}"></script>
+	</body>
+</html>

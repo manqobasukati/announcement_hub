@@ -1,0 +1,28 @@
+div.row.top-bar{
+				background-color:rgb(13,17,44);
+				color:rgb(255,255,255);
+				}
+			ul>li{
+				list-style-type:none;
+				color:rgb(245,43,65)
+			}
+			h3.name-of-company{
+				margin-top:5px;
+			}
+			
+			div.sidebar{
+				margin-left:-40px;
+				background-color:rgb(230,230,230);
+				height:100%;
+				width:2cm;
+				z-index:1;
+				position:fixed;
+			}
+			span.help{
+				border:1px solid;
+				margin-left:990px;
+				margin-top:-3030px;
+				font-size:15px;
+			}
+			
+			

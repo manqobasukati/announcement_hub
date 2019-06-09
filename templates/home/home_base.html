@@ -1,0 +1,53 @@
+<html>
+	<head>
+		<title>{% block title %} {% endblock %}</title>
+		<link rel="stylesheet" href="{{url_for('static',filename='bootstrap/css/bootstrap.css')}}"/>
+		<link rel="stylesheet" href="{{url_for('static',filename='css/home_base.css')}}" />
+		{% block css %}
+		{% endblock %}
+	</head>
+	<body>
+	<div class="container-fluid">
+	<div class="navigation">
+		<div class="row">
+			<div class="col-md-4">
+				<img class="logo" src="{{url_for('static',filename='images/ahub_logo/logo_3.png')}}" width="50"/>
+			</div>
+			<div class="col-md-3">
+				
+			</div>
+			<div class="col-md-4">
+				<nav>
+					<ul>
+						<li><a href="/">Home</a></li>
+						<li><a>About</a></li>
+						<li><a href="{{url_for('account_print.sign_up_view')}}">Sign Up</a></li>
+						<li><a href="{{url_for('account_print.sign_in_view')}}">Sign In</a></li>
+						<li>Team</li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+	
+	<div class="content">
+	{% block content %}
+		<div class="row">
+			<div class="col-md-4 content-1">
+				<h2><b>Struggling to make your voice heard?</b></h2>
+				<p>
+					Download our announcement generation application
+					that makes it easier to connect to media houses and
+					make your voice heard
+				</p>
+			</div>
+			<div class="col-md-6 content-2" >
+				<img src="{{url_for('static',filename='images/phone.jpg')}}" width="200"/>
+			</div>
+		</div>
+	{% endblock %}
+	</div>
+	</div>
+	<script src="{{url_for('static', filename='js/jquery.js')}}"></script>
+	</body>
+</html>
