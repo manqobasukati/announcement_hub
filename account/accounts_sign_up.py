@@ -21,7 +21,7 @@ def sign_up_view():
 		if Media.query.filter_by(media_name=name).first() is not None:
 			message = "Media house already exists"
 			return render_template("accounts/sign_up_page.html",title=title,form=form,message=message)
-		password =  bcrypt.generate_password_hash(form.media_password.data).decode('utf-8')
+		password =  bcrypt.generate_password_hash(form.media_password.data)#.decode('utf-8')
 		media = Media(media_name=name,media_type=type,media_email=email,media_password=password)
 		db.session.add(media)
 		db.session.commit()
@@ -36,19 +36,18 @@ def sign_up_view():
 		return render_template("accounts/sign_up_page.html",title=title,form=form, message=message,media_id=media_id)
 	else:
 		return render_template("accounts/sign_up_page.html",title=title,form=form)
-	
+
 #msg = Message(subject='Announcement hub password recovery',sender=app.config.get("MAIL_USERNAME"), recipients=[user.user_email],body="This is your password {}".format(str(random_pass)))
-#mail.send(msg)	
-	
+#mail.send(msg)
+
 @account_print.route("/success-sign-up/")
 def success_sign_up_view():
 	title = "Successfully sign up"
 	return render_template("accounts/success_sign_up_page.html",title=title)
-	
+
 @account_print.route("/email-confirmation/<int:media_id>")
 def email_confirmation_view(media_id):
 	media = Media.query.filter_by(id=media_id).first()
 	media.email_confirmation = True
 	db.session.commit()
 	return redirect(url_for('account_print.success_sign_up_view'))
-	
