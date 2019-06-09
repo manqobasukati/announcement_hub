@@ -44,9 +44,9 @@ from spa_print import spa_print
 
 app.register_blueprint(home_print)
 app.register_blueprint(account_print)
-app.register_blueprint(api_print)
-app.register_blueprint(dashboard_print)
-app.register_blueprint(spa_print)
+#app.register_blueprint(api_print)
+#app.register_blueprint(dashboard_print)
+#app.register_blueprint(spa_print)
 
 
 
