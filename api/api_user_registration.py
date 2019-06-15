@@ -19,7 +19,9 @@ def user_registration_view():
 		user_national_id_number = content["user_national_id_number"]
 		if User.query.filter_by(user_national_id_number=user_national_id_number).first() is not None:
 			print(User.query.filter_by(user_national_id_number=user_national_id_number).first())
-			return jsonify({'message':'user already exists'})
+			return jsonify({'message':'user with id already exists'})
+		if User.query.filter_by(user_phone_number = user_phone_number).first() is not None:
+			return jsonify({'message':'user with phone number already exists'})
 		if (user_name or user_surname or user_email or user_password or user_phone_number or user_national_id_number ) == None:
 			return jsonify({'message':'missing data fields'})
 		else:
