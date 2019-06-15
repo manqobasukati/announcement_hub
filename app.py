@@ -34,6 +34,10 @@ manager.add_command('db',MigrateCommand)
 
 from admin import *
 
+
+
+
+
 from home import home_print
 from account import account_print
 from api import api_print
@@ -41,14 +45,14 @@ from dashboard import dashboard_print
 from spa_print import spa_print
 
 
-
 app.register_blueprint(home_print)
 app.register_blueprint(account_print)
-#app.register_blueprint(api_print)
-#app.register_blueprint(dashboard_print)
+app.register_blueprint(api_print)
+app.register_blueprint(dashboard_print)
 #app.register_blueprint(spa_print)
 
 
+from models import *
 
 
 
@@ -56,4 +60,6 @@ app.register_blueprint(account_print)
 if __name__ == '__main__':
 	#admin.init_app(app)
 	#manager.run()
+	
+	#db.create_all()
 	app.run()

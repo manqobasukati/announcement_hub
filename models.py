@@ -19,14 +19,17 @@ class User(db.Model):
 	announcements = db.relationship('Announcement', backref='announcer', lazy='dynamic')
 	
 	"""
-	def __init__(self,name="",surname="",national_id="",password="man",phone_number="",email=""):
+	def __init__(self,name,surname,user_middle_name,user_postal_address,national_id,password,phone_number,email):
 		self.user_name = name
 		self.user_surname = surname
+		self.user_middle_name = user_middle_name
+		self.user_postal_address = user_postal_address
 		self.user_national_id_number = national_id
 		self.user_phone_number = phone_number
-		self.user_password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+		self.user_password_hash = bcrypt.generate_password_hash(password)
 		self.user_email = email
 	"""
+	
 		
 	def __repr__(self):
 		return '<Announcer id: %s>' % self.user_national_id_number
@@ -66,6 +69,14 @@ class AnnouncementType(db.Model):
 def load_user(media_id):
 	return Media.get(media_id)
 """	
+"""
+radio_media = db.Table('radio_media_announcement',
+			db.Column('slot_id', db.Integer, db.ForeignKey('time_slot.id')),
+			db.Column('announcement_id',db.Integer,db.ForeignKey('announcement.id')),
+			db.Column('content',db.String(500)),
+			db.Column('type',db.String(50))
+			)
+"""
 
 class Announcement(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -75,11 +86,11 @@ class Announcement(db.Model):
 	no_of_days = db.Column(db.Integer)
 	user_id =  db.Column(db.Integer, db.ForeignKey("user.user_id"))
 	media_id =  db.Column(db.Integer, db.ForeignKey("media.id"))
-	paid = db.Column(db.Boolean)
+	paid = db.Column(db.Boolean,default=False)
 	charge = db.Column(db.Float)
-	announced = db.Column(db.Boolean)
+	announced = db.Column(db.Boolean, default=False)
 	print_media_announcement = db.relationship('PrintMediaAnnouncement',backref='print_media_announcement',lazy='dynamic')
-	radio_media_announcement = db.relationship('RadioMediaAnnouncement',backref='radio_media_announcement',lazy='dynamic')
+	radio_media_announcement = db.relationship('RadioMediaAnnouncement', backref='radio_media',lazy='dynamic')
 	radio_media_funeral_announcement = db.relationship('RadioMediaAnncouncemntFuneral',backref='radio_media_funeral_announcement',lazy='dynamic')
 	
 	
@@ -91,6 +102,7 @@ class PrintMediaAnnouncement(db.Model):
 	content = db.Column(db.String(50))
 	section = db.Column(db.String(50))
 	contact = db.Column(db.Integer)
+	date = db.Column(db.String(20))
 	word_count = db.Column(db.Integer)
 	announcement_id =  db.Column(db.Integer, db.ForeignKey("announcement.id"))
 	
@@ -109,33 +121,38 @@ class RadioMediaAnnouncementCharge(db.Model):
 	charge_per_time_slot = db.Column(db.Float)
 	#charge_per_day = db.Column(db.Float)
 	
-class RadioMediaAnnouncementTimeSlot(db.Model):
-	id = db.Column(db.Integer, primary_key=True)
-	radio_media_announcement_id = db.Column(db.Integer, db.ForeignKey("radiomediaannouncement.id"))
-	time_slot = db.Column(db.String(100))
-	read = db.Column(db.Boolean, default=False)
+
 	
+
+
 class RadioMediaAnnouncement(db.Model):
-	__tablename__ = "radiomediaannouncement"
+	__tablename__ = "radio_media_announcement"
 	id = db.Column(db.Integer, primary_key=True)
 	contact = db.Column(db.Integer)
 	type = db.Column(db.String(50))
-	no_of_time_slots = db.Column(db.Integer)
 	content = db.Column(db.String(500))
+	read = db.Column(db.Boolean, default=False)
+	date = db.Column(db.String(20))
 	media_id = db.Column(db.Integer, db.ForeignKey("media.id"))
 	announcement_id =  db.Column(db.Integer, db.ForeignKey("announcement.id"))
-	radio_media_announcement_time_slot = db.relationship('RadioMediaAnnouncementTimeSlot',backref='radio_media_announcement_time_slot',lazy='dynamic')
-	
+	time_slot = db.Column(db.String(10))
+
 
 	
 class RadioMediaAnncouncemntFuneral(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	announcement_id =  db.Column(db.Integer, db.ForeignKey("announcement.id"))
 	deceased_name = db.Column(db.String(50))
 	deceased_other_name = db.Column(db.String(50))
 	funeral_date = db.Column(db.DateTime, default=datetime.datetime.now)
 	funeral_venue = db.Column(db.String(50))
 	vigil_venue = db.Column(db.String(50))
+	contact = db.Column(db.Integer)
+	time_slot = db.Column(db.String(10))
+	read = db.Column(db.Boolean,default=False)
+	date = db.Column(db.String(20))
+	type =  db.Column(db.String(20), default='funeral')
+	announcement_id =  db.Column(db.Integer, db.ForeignKey("announcement.id"))
+	media_id = db.Column(db.Integer, db.ForeignKey("media.id"))
 	
 	
 	

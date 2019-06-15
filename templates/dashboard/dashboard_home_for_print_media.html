@@ -1,0 +1,93 @@
+<html>
+	<head>
+		<title>Dashbboard home page</title>
+		<link rel="stylesheet" href="{{url_for('static',filename='bootstrap/css/bootstrap.min.css')}}">
+		<link rel="stylesheet" href="{{url_for('static',filename='css/dashboard.css')}}">
+	</head>
+	<body>
+			<nav class="navbar navbar-expand-lg navbar-light navbar-custom" >
+			  <a class="navbar-brand" href="#">
+				 <a href="/dashboard/announcements"><img src="{{url_for('static',filename='images/ahub_logo/logo_3.png')}}" alt="" width="40"></a>
+				  <span class="navbar-text" style="color:white;">
+					{{media_name}}
+				  </span>
+			  </a>
+			  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			  </button>
+			  <div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ml-auto" >
+				  <li class="nav-item active">
+					<a class="nav-link" style="color: white;" href="dashboard_home.html">announcements <span class="sr-only">(current)</span></a>
+				  </li>
+				  <li class="nav-item dropdown  ml-auto">
+					<a class="nav-link dropdown-toggle" style="color: white;" data-toggle="dropdown">account</a>
+					<div class="dropdown-menu">
+						<a href="account_profile.html" class="dropdown-item">Profile</a>
+						<a href="/dashboard/set-rates" class="dropdown-item">Charges</a>
+					</div>
+				  </li>
+				  <li class="nav-item">
+					<a class="nav-link" style="color: white;" href="#">logout</a>
+				  </li>
+				</ul>
+			  </div>
+			</nav>
+			<div class="container-fluid" style="margin-top: 10px;">
+				<div class="row"  style="margin-bottom: 10px;">
+					<div class="col-md-12">
+						<div class="card">
+						  <div class="card-body">
+							<h5>Annoucnemnts</h5>
+						  </div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-3">
+						<div class="card">
+						  <div class="card-body">
+							<form  method="POST" action="{{url_for('dashboard_print.dashboard_announcements_view')}}">
+								<div class="form-group">
+									<label>announcement section</label>
+									<select class="form-control" id="exampleFormControlSelect1" name="announcement_section">
+									  <option value="funeral">funeral</option>
+									  <option value="sports">sports</option>
+									  <option value="church">church</option>
+									</select>
+								</div>
+								<!--if radio announcement-->
+								<div class="form-group">
+								<label>announcement date</label>
+									<input type="date"  class="form-control" name="announcement_date" placeholder=""/>
+								</div>
+								<button type="submit" class="btn btn-primary">Submit</button>
+							</form>
+						  </div>
+						</div>
+					</div>
+					<div class="col-md-9">
+						<div class="row">
+							{% for a in announcements %}
+										<div class="col-sm-3" >
+											 <div class="card" style="margin-bottom:5px;">
+												<div class="card-body">
+												  <h5 class="card-title">{{a.section}}</h5>
+												  <p class="card-text">{{a.content}}</p>
+												</div>
+												
+												<div class="card-footer">
+												  <small class="text-muted"><a href="/dashboard/announcements/print/{{a.section}}/{{a.id}}">view</a></small>
+												</div>
+												
+											 </div>
+										</div>
+										
+							{% endfor %}
+							</div>
+						</div>
+								
+	</body>
+	<script src="{{url_for('static',filename='js/jquery.js')}}"></script>
+	<script src="{{url_for('static',filename='bootstrap/js/bootstrap.min.js')}}"></script>
+</html>

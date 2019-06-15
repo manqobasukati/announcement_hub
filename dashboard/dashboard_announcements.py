@@ -3,98 +3,103 @@ from flask_login import login_required, current_user
 from dashboard import dashboard_print
 from app import db
 from random import randint
-from models import Announcement,User, PrintMediaAnnouncement, Media, RadioMediaAnnouncementTimeSlot, RadioMediaAnnouncement
+from models import Announcement,User, PrintMediaAnnouncement, Media, RadioMediaAnnouncement,RadioMediaAnncouncemntFuneral
 from forms import AnnouncementCriteriaPrint, AnnouncementCriteriaRadio
 import datetime
 from datetime import date
+
 
 
 @dashboard_print.route("/announcements", methods=['GET','POST'])
 @login_required
 def dashboard_announcements_view():
 	title = "Anncouncements"
-	media = Media.query.filter_by(id=current_user.id).first()
-	#announcements = Announcement.query.filter_by(media_id=media.id).all()
-	if media.media_type == 'print_media':
-		#form = AnnouncementCriteriaPrint()
-		announcements = Announcement.query.filter_by(media_id=media.id).all()
-		start = date(year=2019,month=2,day=14)
-		end = date(year=2019,month=2,day=14)
-		p = Announcement.query.filter(Announcement.start_day == start).all()
-		print(p)
+	announcements = []
+	id = current_user.get_id()
+	media = Media.query.filter_by(id=id).first()
+	if media.media_type == 'radio_media':
+	
+		for a in Announcement.query.filter_by(media_id=media.id).all():
+			for b in a.radio_media_announcement:
+				if b.date == str(datetime.date.today()) and b.read ==  False:
+					announcements.append(b)
+			
+			for c in a.radio_media_funeral_announcement:
+				if c.date == str(datetime.date.today()) and c.read == False:
+					announcements.append(c)
+		print(announcements)		
 		if request.method == 'POST':
-			announcements = Announcement.query.filter_by(announced = int(form.announced.data)).all()
-		return render_template("dashboard/dashboard_announcements_page.html",title=title, announcements=announcements,media=media,form=form)
-	elif media.media_type == 'radio_media':
-		form = AnnouncementCriteriaRadio()
-		x = datetime.datetime.now()
-		#start = date(year=x.year,month=x.month,day=x.day)
-		#end = date(year=x.year,month=x.month,day=x.day+1)
-		#print(str(x)[0:10])
-		#p = Announcement.query.filter(Announcement.start_day >= start).filter(Announcement.start_day <= end).filter_by(media_id=media.id).all()
-		first_time_slot = []
-		
-		second_time_slot = []
-		for i in Announcement.query.filter_by(media_id=media.id).all():
-			if str(i.start_day)[0:10] == str(x)[0:10]:
-				#no_of_days = i.end_day.day - i.start_day.day
-				#i.start_day 
-				#print(no_of_days)
-				for k in i.radio_media_announcement:
-					for j in k.radio_media_announcement_time_slot:
-						if j.time_slot == "10:30":
-							first_time_slot.append(i)
-						elif j.time_slot == "5:30":
-							second_time_slot.append(i)
-						
-		r_a = RadioMediaAnnouncement.query.filter_by(media_id=media.id).all()
-		print(first_time_slot)
-		print(second_time_slot)
-		return render_template("dashboard/dashboard_announcements_page.html",title=title,today=str(x)[0:10],first_time_slot=first_time_slot,second_time_slot=second_time_slot,media=media,form=form)
-		
-	#user = User.query.filter_by(user_id=announcements.user_id).first()
-	#print_media  = PrintMediaAnnouncement.query.filter_by(announcement_id=1).first()
-	return render_template("dashboard/dashboard_announcements_page.html",title=title)
-	
+			if request.form['announcement_type'] == 'funeral':
+				announcements = RadioMediaAnncouncemntFuneral.query.filter(
+									 (RadioMediaAnncouncemntFuneral.date==str(request.form['announcement_date']))&
+										(RadioMediaAnncouncemntFuneral.media_id==media.id) & 
+											(RadioMediaAnncouncemntFuneral.type==request.form['announcement_type']) & 
+												(RadioMediaAnncouncemntFuneral.time_slot==request.form['time_slot'])).all()
+				return render_template("dashboard/dashboard_home_for_radio_media.html",media_name=media.media_name,announcements=announcements)
+			elif request.form['announcement_type'] == ('sports' or 'cars'):
+				announcements = RadioMediaAnnouncement.query.filter(
+										 (RadioMediaAnnouncement.date==str(request.form['announcement_date']))&
+											(RadioMediaAnnouncement.media_id==media.id) & 
+												(RadioMediaAnnouncement.type==request.form['announcement_type']) & 
+													(RadioMediaAnnouncement.time_slot==request.form['time_slot'])).all()
+		return render_template("dashboard/dashboard_home_for_radio_media.html",media_name=media.media_name,announcements=announcements)
+	elif media.media_type == 'print_media':
+		"""
+		announcements = PrintMediaAnnouncement.query.filter(
+							(Announcement.media_id == media.id)
+								(str(Announcement.start_day)[0:10] == str(datetime.date.today()))
+								).all() 
+		"""
+		announcements = []
+		for a in PrintMediaAnnouncement.query.filter(Announcement.media_id == media.id).all():
+			if str(a.print_media_announcement.start_day)[0:10] == str(datetime.date.today()) and a.print_media_announcement.announced == False:
+				announcements.append(a)
+		if request.method == 'POST':
+			announcements = []
+			for b in PrintMediaAnnouncement.query.filter(Announcement.media_id == media.id).all():
+				if (request.form['announcement_date'] == str(b.print_media_announcement.start_day)[0:10]) and (request.form['announcement_section'] == b.section)  and (b.print_media_announcement.announced == False):
+					print("True")
+					announcements.append(b)
+		return render_template("dashboard/dashboard_home_for_print_media.html",media_name=media.media_name,announcements=announcements)
+							
 
 
-
-	
-	
-@dashboard_print.route("/announcements/<int:id>/<int:time_slot_id>/<string:time_slot>", methods=['GET','POST'])
-def dashboard_single_announcement_view(id,time_slot_id,time_slot):
-	a = Announcement.query.filter_by(id=id).first()
-	message = ''
-	link = '/dashboard/announcements/'+str(id)+'/'+str(time_slot_id)+'/'+time_slot
-	ra = RadioMediaAnnouncement.query.filter_by(announcement_id=a.id).first()
-	tm = RadioMediaAnnouncementTimeSlot.query.filter_by(radio_media_announcement_id=ra.id,id=time_slot_id,time_slot=time_slot).first()
-	#print(link)
-	if request.method == 'POST':
-		if a.announcement_type == 'radio_media':
-			message = 'Succesfully announced announcement'
-			ra = RadioMediaAnnouncement.query.filter_by(announcement_id=a.id).first()
-			a.no_of_days = a.no_of_days - 1
-			a.start_day = date(year=a.start_day.year,month=a.start_day.month,day = a.start_day.day + 1)
-			#tm.read = True
-			ra = RadioMediaAnnouncement.query.filter_by(announcement_id=a.id).first()
-			tm = RadioMediaAnnouncementTimeSlot.query.filter_by(radio_media_announcement_id=ra.id,id=time_slot_id,time_slot=time_slot).first()
-			if a.no_of_days != 0:
-				tm.read = False
-				a.announced = False
-				db.session.commit()
-			else:
-				tm.read = True
-				db.session.commit()
-			
-			if tm.read is True:
-				a.announced = True
-				db.session.commit()
-			#db.session.delete(tm)
-			
+@dashboard_print.route("/announcements/<type>/<int:id>", methods=['GET','POST'])
+def dashboard_single_announcement_view(type,id):
+	if type == 'funeral':
+		announcement = RadioMediaAnncouncemntFuneral.query.filter_by(id=id).first()
+		message = ''
+		if request.method == 'POST':
+			announcement.read = True
+			db.session.add(announcement)
 			db.session.commit()
-			return render_template("dashboard/dashboard_single_announcement_page.html", a=a,tm=tm,message=message)
-	return render_template("dashboard/dashboard_single_announcement_page.html", a=a, tm=tm,link=link,message=message)
+			message = 'Announcement succesfully read'
+			return render_template('dashboard/single_funeral_announcement.html', announcement=announcement,message=message)
+		return render_template('dashboard/single_funeral_announcement.html', announcement=announcement)
+	else:
+		announcement = RadioMediaAnnouncement.query.filter_by(id=id).first()
+		message = ''
+		if request.method == 'POST':
+			announcement.read = True
+			db.session.add(announcement)
+			db.session.commit()
+			message = 'Announcement succesfully read'
+			return render_template('dashboard/single_radio_announcement.html', announcement=announcement,message=message)
+		return render_template('dashboard/single_radio_announcement.html', announcement=announcement)
+		
+@dashboard_print.route("/announcements/print/<type>/<int:id>", methods=['GET','POST'])
+def dashboard_single_print_announcement_view(type,id):
+	announcement = PrintMediaAnnouncement.query.filter_by(id=id).first()
+	message = ''
+	if request.method == 'POST':
+		announcement.print_media_announcement.announced = True
+		db.session.add(announcement)
+		db.session.commit()
+		message = 'Announcement succesfully read'
+		return render_template('dashboard/single_print_announcement.html', announcement=announcement,message=message)
+	return render_template('dashboard/single_print_announcement.html', announcement=announcement)
 	
+
 	
 
 	

@@ -17,9 +17,13 @@
 					</div>
 				{% endif %}
 			</div>
-			<div>
-				<h3><a href="/accounts/email-confirmation/{{media_id}}">{{message}}</a></h3>
-			</div>
+			
+		
+			{% if message %}
+				<div class="alert alert-primary" role="alert">
+				{{message}}
+				</div>
+			{% endif %}
 			<form action="/accounts/sign-up" method="POST">
 				{{form.csrf_token}}
 				<div class="form-group">

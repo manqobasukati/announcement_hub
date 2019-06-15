@@ -1,13 +1,15 @@
 #Create an announcement
-
+from datetime import datetime
+#import datetime
 from api import api_print
-from api.api_user_login import *
+#from api.api_user_login import *
 from flask import request,jsonify, url_for
 import requests, urllib
-from datetime import datetime
-from models import Announcement,AnnouncementType, RadioMediaAnncouncemntFuneral, Media,RadioMediaAnnouncementCharge, RadioMediaAnnouncement,RadioMediaAnnouncementTimeSlot, PrintMediaAnnouncement,PrintMediaAnnouncementCharge
+from app import db
+from models import Announcement,AnnouncementType, RadioMediaAnncouncemntFuneral, Media,RadioMediaAnnouncementCharge, RadioMediaAnnouncement, PrintMediaAnnouncement,PrintMediaAnnouncementCharge
 from api import token_required
 from sqlalchemy.exc import IntegrityError
+from api.functions import dates, create_radio_normal_announcemnet_bill,create_print_announcement_bill
 
 
 def string_to_date(date):
@@ -15,6 +17,20 @@ def string_to_date(date):
 	month = date[3:5]
 	year = date[6:10]
 	return datetime(int(year),int(month),int(day))
+	
+"""
+def dates(start_day,end_day):
+	start = datetime.datetime.strptime(start_day, "%d-%m-%Y")
+	end = datetime.datetime.strptime(end_day, "%d-%m-%Y")
+	date_array = (start + datetime.timedelta(days=x) for x in range(0, (end-start).days+1))
+	my_list = []
+	for date_object in date_array:
+		my_list.append(date_object.strftime("%d-%m-%Y"))
+	return my_list
+"""
+
+
+
 
 @api_print.route('/all-media-houses',methods=['POST','GET'])
 def expose_all_media_houses():
@@ -36,44 +52,67 @@ def expose_all_media_houses():
 		
 
 	return jsonify(m)
-
-		
+"""
+"""	
 @api_print.route('/status', methods=['GET','POST'])
 def status_view():
 	data = request.json
 	if request.method == 'POST':
 		p = []
-		i = 0
-		print(data['user_id'])
+		j = 0
 		for announcement in Announcement.query.filter_by(user_id=data['user_id']).all():
 			k = {}
 			k['from_date'] = announcement.start_day
 			k['to_date'] = announcement.end_day
 			k['id'] = announcement.id
 			k['read'] = announcement.announced
-			#print(announcement.radio_media_announcement[0].radio_media_announcement_time_slot[0].time_slot)
-			if announcement.radio_media_announcement:
-				k['time_slot'] = announcement.radio_media_announcement[0].radio_media_announcement_time_slot[0].time_slot
+			
+			
+			if announcement.radio_media_announcement is not None:
+				k['radio_announcements'] = []
+				for i in announcement.radio_media_announcement:
+					u = {}
+					u['read'] = i.read
+					u['id']  = i.id
+					u['contact'] = i.contact
+					k['radio_announcements'].append(u)
+				
+				
+				if len(k['radio_announcements']) == 0:
+					del k['radio_announcements']
+				
+			if announcement.radio_media_funeral_announcement is not None:
+				k['radio_funeral_announcements'] = []
+				for i in announcement.radio_media_funeral_announcement:
+					u = {}
+					u['read'] = i.read
+					u['id']  = i.id
+					u['contact'] = i.contact
+					k['radio_funeral_announcements'].append(u)
+					
+				if len(k['radio_funeral_announcements']) == 0:
+					del k['radio_funeral_announcements']
+					
+			if announcement.print_media_announcement is not None:
+				k['print_media_announcement'] = {}
+				for i in announcement.print_media_announcement:
+					k['print_media_announcement']['id'] = i.id 
+					k['print_media_announcement']['content'] = i.content
+				
+				if len(k['print_media_announcement']) == 0:
+					del k['print_media_announcement']
+				
+			
 			p.append(k)
+			
 		
-		"""		
-		for announcement in Announcement.query.filter_by(user_id=data['user_id']).all():
-			k = {}
-			k['from_date'] = announcement.start_day
-			k['to_date'] = announcement.end_day
-			k['id'] = announcement.id
-			k['read'] = announcement.announced
-			#print(announcement.radio_media_announcement[0].radio_media_announcement_time_slot[0].time_slot)
-			if announcement.radio_media_announcement:
-				k['time_slot'] = announcement.radio_media_announcement[0].radio_media_announcement_time_slot[1].time_slot
-			p.append(k)
-		"""	
+		
 		return jsonify(p)
-	
+"""
+"""	
 @api_print.route('/create-radio-normal-announcement-bill',methods=['POST','GET'])
 def create_radio_normal_announcemnet_view_bill():
 	data = request.json
-	date = "2018-12-02"
 	if request.method == 'POST':
 		days = string_to_date(data['to_date']) - string_to_date(data['from_date'])
 		days_in_str = str(days)
@@ -85,29 +124,29 @@ def create_radio_normal_announcemnet_view_bill():
 
 	
 
+	
 
 @api_print.route('/create-radio-normal-announcement',methods=['POST','GET'])
 #@token_required
-def create_radio_normal_announcement_view():#current_user):
+def create_radio_normal_announcement_view():
 	data = request.json
 	if request.method == 'POST':
 		json = {'to_date':data['to_date'],'from_date':data['from_date'],'time_slots':data['time_slots'],'media_id':data['media_id']}
-		#r = requests.post('http://127.0.0.1:5000/api/v1/create-radio-normal-announcement-bill',json=json,proxies={'http':None})
-		#d = r.json()
-		#print(d)
-		announcement = Announcement(announcement_type='radio_media',start_day=string_to_date(data['from_date']),end_day=string_to_date(data['to_date']),user_id=data['user_id'],media_id=data['media_id'],paid=False,announced=False)
+		announcement = Announcement(announcement_type='radio_media',start_day=string_to_date(data['from_date']),
+						end_day=string_to_date(data['to_date']),user_id=data['user_id'],media_id=data['media_id'],paid=False,announced=False)
 		announcement.no_of_days = string_to_date(data['to_date']).day - string_to_date(data['from_date']).day
-		print(string_to_date(data['to_date']).day - string_to_date(data['from_date']).day)
-		#announcement.charge = d['total_charge']
+		announcement.charge = create_radio_normal_announcemnet_bill(data)
 		db.session.add(announcement)
 		db.session.commit()
-		radio_announce = RadioMediaAnnouncement(contact=data['contact'],type=data['type'],content=data['content'],media_id=data['media_id'],announcement_id=announcement.id)
-		db.session.add(radio_announce)
-		db.session.commit()
-		for i in data['time_slots']:
-			time_s = RadioMediaAnnouncementTimeSlot(time_slot=i,radio_media_announcement_id=radio_announce.id)
-			db.session.add(time_s)
-			db.session.commit()
+		start_day = data['from_date']
+		end_day = data['to_date']
+		for i in dates(start_day,end_day):
+			for j in data['time_slots']:
+				radio_announce = RadioMediaAnnouncement(contact=data['contact'],type=data['type'],content=data['content'],
+										media_id=data['media_id'],announcement_id=announcement.id,date=str(string_to_date(i))[0:10], time_slot=j)
+				db.session.add(radio_announce)
+				db.session.commit()
+		
 		return jsonify({'message':'sucessfully created radio announcement'})
 		
 		
@@ -118,36 +157,30 @@ def create_radio_normal_announcement_view():#current_user):
 	
 @api_print.route('/create-radio-funeral-announcement',methods=['POST','GET'])
 #@token_required
-def create_radio_funeral_announcemnet_view():#current_user):
+def create_radio_funeral_announcemnet_view():
 	data = request.json
 	if request.method == 'POST':
 		json = {'to_date':data['to_date'],'from_date':data['from_date'],'time_slots':data['time_slots'],'media_id':data['media_id']}
-		r = requests.post('http://announcementhub.pythonanywhere.com/api/v1/create-radio-normal-announcement-bill',json=json,proxies={'http':None})
-		d = r.json()
-		print(d)
-		announcement = Announcement(announcement_type='radio_media',user_id=data['user_id'],media_id=data['media_id'],announced=False,paid=False)
-		announcement.charge = d['total_charge']
+		announcement = Announcement(announcement_type='radio_media',start_day=string_to_date(data['from_date']),
+						end_day=string_to_date(data['to_date']),user_id=data['user_id'],media_id=data['media_id'],announced=False,paid=False)
+		announcement.charge = create_radio_normal_announcemnet_bill(data)
 		db.session.add(announcement)
 		db.session.commit()
-		r_f_announcement = RadioMediaAnncouncemntFuneral(announcement_id=announcement.id,deceased_name=data['deceased_name'],deceased_other_name=data['deceased_other_name'],funeral_venue=data['funeral_venue'],vigil_venue=data['vigil_venue'])
-		db.session.add(r_f_announcement)
-		db.session.commit()
-		for i in data['time_slots']:
-			time_s = RadioMediaAnnouncementTimeSlot(time_slot=i,radio_media_announcement_id=r_f_announcement.id)
-			db.session.add(time_s)
-			db.session.commit()
-		return jsonify({'message':'successfully submited funeral announcement'})
-	return jsonify({'message':'just a get request user'})
-	
+		start_day = data['from_date']
+		end_day = data['to_date']
+		for i in dates(start_day,end_day):
+			for j in data['time_slots']:
+				radio_announce = RadioMediaAnncouncemntFuneral(contact=data['contact'],
+										announcement_id=announcement.id,deceased_name=data['deceased_name'],
+										deceased_other_name=data['deceased_other_name'],
+										funeral_venue=data['funeral_venue'],vigil_venue=data['vigil_venue'],
+										media_id=data['media_id'],date=str(string_to_date(i))[0:10], time_slot=j)
+				db.session.add(radio_announce)
+				db.session.commit()
+		
+		return jsonify({'message':'sucessfully created radio announcement'})
 
 
-def total_charge_(no_of_days, content_count, charge_per_word,per_pic,pic):
-	total = 0
-	if pic == '':
-		total = no_of_days * (content_count*charge_db.charge_per_word + charge_db.per_pic )
-	elif pic != '':
-		total = no_of_days * (content_count*charge_db.charge_per_word)
-	return total 
 		
 	
 	
@@ -173,12 +206,6 @@ def create_print_announcement_view():#current_user):
 	data = request.json
 	if request.method == 'POST':
 		json = {'to_date':data['to_date'],'from_date':data['from_date'],'content':data['content'],'picture':data['picture'],'media_id':data['media_id']}
-		print("Send 2")
-		r = requests.post('http://announcementhub.pythonanywhere.com/api/v1/create-print-announcement-bill',json=json,proxies={'http':None})
-		print("Send 3")
-		d = r.json()
-		print(data['from_date'])
-		
 		try:
 			announcement = Announcement(
 							announcement_type='print_media',
@@ -187,7 +214,7 @@ def create_print_announcement_view():#current_user):
 							start_day=string_to_date(data['from_date']),
 							end_day=string_to_date(data['to_date'])
 							)
-			announcement.charge = d['total_charge']
+			announcement.charge = create_print_announcement_bill(data)
 			
 			db.session.add(announcement)
 			db.session.commit()
@@ -202,8 +229,9 @@ def create_print_announcement_view():#current_user):
 		try:
 			p_announcement = PrintMediaAnnouncement(
 								announcement_id=announcement.id,
-								section=data['section'],
+								section=data['type'],
 								contact=data['contact'],
+								content = data['content'],
 								picture=data['picture'])
 								
 			p_announcement.number_of_days = int(content[0])
@@ -213,3 +241,4 @@ def create_print_announcement_view():#current_user):
 			return jsonify({'message':'Database integrity error'})
 		
 		return jsonify({'message':'successfully submited print media announcement'})
+
